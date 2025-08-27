@@ -1,4 +1,5 @@
 #pragma once
+
 #include <cstdint>
 #include <format>
 #include <stdexcept>
@@ -20,7 +21,7 @@ enum class OrderStatus {
     Cancelled
 };
 
-using Price = std::uint32_t;
+using Price = uint32_t;
 using Quantity = std::uint32_t;
 using OrderId = std::uint64_t;
 
@@ -67,7 +68,7 @@ public:
 
     void cancel() {
         if (orderStatus_ == OrderStatus::Filled)
-            throw std::logic_error(std::format("Cannot cancel order ({}) as it has already been filled.", getOrderId()));
+            throw std::logic_error(std::format("Cannot cancel Order ({}) as it has already been filled.", getOrderId()));
         
         orderStatus_ = OrderStatus::Cancelled;
     }
