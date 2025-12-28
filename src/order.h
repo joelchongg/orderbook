@@ -4,6 +4,8 @@
 #include <format>
 #include <stdexcept>
 
+namespace ob {
+
 enum class OrderType {
     Limit,
     Market
@@ -21,6 +23,12 @@ enum class OrderStatus {
     Cancelled
 };
 
+enum class TimeInForce {
+    GoodTillCancel,
+    ImmediateOrCancel,
+    FillOrKill
+};
+
 using Price = uint32_t;
 using Quantity = std::uint32_t;
 using OrderId = std::uint64_t;
@@ -30,16 +38,18 @@ private:
     OrderId orderId_;
     OrderType orderType_;
     OrderSide orderSide_;
+    TimeInForce timeInForce_;
     Price price_;
     Quantity initialQuantity_;
     Quantity remainingQuantity_;
     OrderStatus orderStatus_;
 
 public:
-    Order(OrderId orderId, OrderType orderType, OrderSide orderSide, Price price, Quantity quantity)
+    Order(OrderId orderId, OrderType orderType, OrderSide orderSide, TimeInForce timeInForce, Price price, Quantity quantity)
         : orderId_ { orderId }
         , orderType_ { orderType }
         , orderSide_ { orderSide }
+        , timeInForce_ { timeInForce }
         , price_ { price }
         , initialQuantity_ { quantity }
         , remainingQuantity_ { quantity }
@@ -49,6 +59,7 @@ public:
     OrderId getOrderId() const { return orderId_; }
     OrderType getOrderType() const { return orderType_; }
     OrderSide getOrderSide() const { return orderSide_; }
+    TimeInForce getTimeInForce() const { return timeInForce_; }
     Price getPrice() const { return price_; }
     Quantity getInitialQuantity() const { return initialQuantity_; }
     Quantity getRemainingQuantity() const { return remainingQuantity_; }
@@ -73,3 +84,4 @@ public:
         orderStatus_ = OrderStatus::Cancelled;
     }
 };
+} // namespace ob

@@ -9,6 +9,8 @@
 #include "trade.h"
 #include "order.h"
 
+namespace ob {
+
 using OrderPointer = std::shared_ptr<Order>;
 using OrderPointers = std::list<OrderPointer>;
 using Trades = std::vector<Trade>;
@@ -20,14 +22,20 @@ private:
         OrderPointers::iterator location_;
     };
 
-    std::map<Price, OrderPointers, std::greater<Price>> buyOrders_;
-    std::map<Price, OrderPointers, std::less<Price>> sellOrders_;
+public:
+    void addOrder(OrderPointer order);
+    void removeOrder(OrderId orderId);
+    void cancelOrder(OrderId orderId);
+    
+    std::map<Price, OrderPointers, std::greater<Price>>& getBuyOrders() { return buyOrders_; }
+    std::map<Price, OrderPointers, std::less<Price>>& getSellOrders() { return sellOrders_; }
+    std::unordered_map<OrderId, OrderEntry>& getOrders() { return orders_; }
+
+private:
+    std::map<Price, OrderPointers, std::greater<Price>> buyOrders_; // highest price first
+    std::map<Price, OrderPointers, std::less<Price>> sellOrders_;   // 
     std::unordered_map<OrderId, OrderEntry> orders_;
 
-public:
-    //TODO
-    void addOrder(OrderPointer order) {}
 
-    //TODO
-    void cancelOrder(OrderId orderId) {}
 };
+} // namespace ob

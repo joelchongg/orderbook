@@ -1,21 +1,32 @@
 #pragma once
 
-#include <cstdint>
+#include "order.h"
 
-using Price = uint32_t;
-using Quantity = std::uint32_t;
-using OrderId = std::uint64_t;
+#include <cstdint>
+#include <memory>
+
+namespace ob {
+
+using OrderPointer = std::shared_ptr<Order>;
 
 struct Trade {
     OrderId buyOrderId_;
     OrderId sellOrderId_;
-    Price price_;
-    Quantity quantity_;
+    Price tradePrice_;
+    Quantity tradeQuantity_;
 
-    Trade(OrderId buyOrderId, OrderId sellOrderId, Price price, Quantity quantity)
-        : buyOrderId_ { buyOrderId }
-        , sellOrderId_ { sellOrderId }
-        , price_ { price }
-        , quantity_ { quantity_ }
-    { }
+    // Used for replay (eventually)
+    Price buyOrderPrice_;
+    OrderType buyOrderType_;
+    TimeInForce buyOrderTIF_;
+    Price sellOrderPrice_;
+    OrderType sellOrderType_;
+    TimeInForce sellOrderTIF_;
+
+    static Trade createTrade(const OrderPointer& buyOrder, const OrderPointer& sellOrder, Price tradePrice, Quantity tradeQty) {
+        return {buyOrder->getOrderId(), sellOrder->getOrderId(), tradePrice, tradeQty,
+                buyOrder->getPrice(), buyOrder->getOrderType(), buyOrder->getTimeInForce(),
+                sellOrder->getPrice(), sellOrder->getOrderType(), sellOrder->getTimeInForce()};
+    }
 };
+} // namespace ob
