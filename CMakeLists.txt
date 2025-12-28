@@ -1,14 +1,14 @@
 cmake_minimum_required(VERSION 3.20)
 project(OrderBook CXX)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 20) # Currently use C++20, may change to C++23
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Library of core sources (exclude any app main)
+# Library of core sources
 add_library(orderbook_lib
-    src/orderbook.cpp
     src/matching_engine.cpp
     src/order_gateway.cpp
+    src/orderbook.cpp
 )
 
 # Public headers location
@@ -42,5 +42,4 @@ catch_discover_tests(orderbook_tests)
 
 
 # Run tests via ctest 
-# cmake --build build   
-# --test-dir build --output-on-failure  
+# cmake --build build && ctest --test-dir build --output-on-failure  
