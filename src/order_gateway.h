@@ -1,6 +1,7 @@
 #pragma once
 
 #include "matching_engine.h"
+#include "order.h"
 #include "order_events.h"
 
 namespace ob {

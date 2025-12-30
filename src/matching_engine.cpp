@@ -1,5 +1,8 @@
 #include "matching_engine.h"
 
+#include "order.h"
+#include "utils/object_pool.h"
+
 #include <format>
 #include <numeric>
 
@@ -18,6 +21,10 @@ void MatchingEngine::onNewOrder(OrderPointer order) {
             tif == TimeInForce::ImmediateOrCancel || tif == TimeInForce::FillOrKill) {
             order->cancel();
         }
+    }
+
+    if (order->getOrderStatus() == OrderStatus::Filled || order->getOrderStatus() == OrderStatus::Cancelled) {
+        ObjectPool::release(order);
     }
 }
 
@@ -118,20 +125,14 @@ void MatchingEngine::matchWithBook(OrderPointer& incomingOrder, BookType& opposi
         if (!canMatch(incomingOrder)) {
             break;
         }
-
+        
         auto& [_, ordersAtPrice] = *oppositeBook.begin();
-        auto restingOrder = ordersAtPrice.front();
+        auto& restingOrder = ordersAtPrice.front();
         Trade trade = executeTrade(incomingOrder, restingOrder);
         tradeHistory_.recordTrade(trade);
 
         if (restingOrder->getOrderStatus() == OrderStatus::Filled) {
-            ordersAtPrice.pop_front();
-            OrderId restingOrderId = restingOrder->getOrderId();
-            orderBook_.getOrders().erase(restingOrderId);
-        }
-
-        if (ordersAtPrice.empty()) {
-            oppositeBook.erase(oppositeBook.begin());
+            orderBook_.removeOrder(restingOrder->getOrderId());
         }
     }
 }

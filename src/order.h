@@ -33,6 +33,7 @@ using Price = uint32_t;
 using Quantity = std::uint32_t;
 using OrderId = std::uint64_t;
 
+
 class Order {
 private:
     OrderId orderId_;
@@ -66,6 +67,19 @@ public:
     Quantity getFilledQuantity() const { return getInitialQuantity() - getRemainingQuantity(); }
     OrderStatus getOrderStatus() const { return orderStatus_; }
 
+    void setOrderId(OrderId id) { orderId_ = id; }
+    void setOrderType(OrderType type) { orderType_ = type; }
+    void setOrderSide(OrderSide side) { orderSide_ = side; }
+    void setTimeInForce(TimeInForce tif) { timeInForce_ = tif; }
+    void setPrice(Price price) { price_ = price; }
+    void setInitialQuantity(Quantity qty) { initialQuantity_ = qty; }
+    void setRemainingQuantity(Quantity qty) { remainingQuantity_ = qty; }
+    void setOrderStatus(OrderStatus status) { orderStatus_ = status; }
+
+    static Order* createDummyOrder() {
+        return new Order{0, OrderType::Limit, OrderSide::Buy, TimeInForce::GoodTillCancel, 0, 0};
+    }
+
     void fill(Quantity quantity) {
         if (quantity == 0) return;
         if (quantity > getRemainingQuantity())
@@ -84,4 +98,7 @@ public:
         orderStatus_ = OrderStatus::Cancelled;
     }
 };
+
+using OrderPointer = Order*;
+
 } // namespace ob

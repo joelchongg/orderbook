@@ -1,4 +1,8 @@
 #include "orderbook.h"
+
+#include "order.h"
+#include "utils/object_pool.h"
+
 #include <format>
 
 namespace ob {
@@ -37,6 +41,7 @@ void OrderBook::removeOrder(OrderId orderId) {
         }
     }
     orders_.erase(it);
+    ObjectPool::release(order);
 }
 
 void OrderBook::cancelOrder(OrderId orderId) {
@@ -46,9 +51,7 @@ void OrderBook::cancelOrder(OrderId orderId) {
         return;
     }
     auto order = it->second.order_;
-    removeOrder(orderId);
     order->cancel();
+    removeOrder(orderId);    
 }
-
-
 } // namespace ob

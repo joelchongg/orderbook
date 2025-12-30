@@ -1,17 +1,17 @@
 #pragma once
 
+#include "trade.h"
+#include "order.h"
+
 #include <functional>
 #include <list>
 #include <map>
 #include <memory>
 #include <queue>
 #include <unordered_map>
-#include "trade.h"
-#include "order.h"
 
 namespace ob {
 
-using OrderPointer = std::shared_ptr<Order>;
 using OrderPointers = std::list<OrderPointer>;
 using Trades = std::vector<Trade>;
 

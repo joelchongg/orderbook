@@ -1,5 +1,6 @@
 #pragma once
 
+#include "order.h"
 #include "orderbook.h"
 #include "tradehistory.h"
 

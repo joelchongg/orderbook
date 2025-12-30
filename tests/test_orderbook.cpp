@@ -1,15 +1,16 @@
 #include <catch2/catch_all.hpp>
 #include "order.h"
 #include "orderbook.h"
-#include "order_gateway.h"
+#include "utils/object_pool.h"
 #include "order_events.h"
+#include "order_gateway.h"
 #include "matching_engine.h"
 #include "tradehistory.h"
 
 using namespace ob;
 
 static OrderPointer make_order(OrderId id, OrderType type, TimeInForce timeInForce, OrderSide side, Price price, Quantity qty) {
-    return std::make_shared<Order>(id, type, side, timeInForce, price, qty);
+    return new Order{id, type, side, timeInForce, price, qty};
 }
 
 TEST_CASE("Add orders populates correct price levels") {
@@ -406,7 +407,7 @@ TEST_CASE("Market order matches consumes all orders and is cancelled due to insu
     REQUIRE(buys.empty());
 }
 
-TEST_CASE("Invalid Market orders are caught (Market + GTC / Market + FOK)") {
+TEST_CASE("Invalid Market orders are caught (Market + GTC)") {
     OrderBook book; TradeHistory history; MatchingEngine engine(book, history); OrderGateway gateway(engine);
     auto invalidMarketOrder = make_order(1300, OrderType::Market, TimeInForce::GoodTillCancel, OrderSide::Buy, 100, 30);
     OrderResult result = gateway.submitOrder(invalidMarketOrder);
@@ -600,5 +601,4 @@ TEST_CASE("IOC and FOK orders do not rest on book") {
     REQUIRE(book.getBuyOrders().empty());
     REQUIRE(fokBuy->getOrderStatus() == OrderStatus::Cancelled);
 }
-
 

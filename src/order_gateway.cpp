@@ -1,5 +1,7 @@
-#include "order_events.h"
 #include "order_gateway.h"
+
+#include "order.h"
+#include "order_events.h"
 
 namespace ob {
 

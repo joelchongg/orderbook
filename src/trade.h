@@ -7,8 +7,6 @@
 
 namespace ob {
 
-using OrderPointer = std::shared_ptr<Order>;
-
 struct Trade {
     OrderId buyOrderId_;
     OrderId sellOrderId_;
