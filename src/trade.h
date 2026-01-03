@@ -21,10 +21,13 @@ struct Trade {
     OrderType sellOrderType_;
     TimeInForce sellOrderTIF_;
 
-    static Trade createTrade(const OrderPointer& buyOrder, const OrderPointer& sellOrder, Price tradePrice, Quantity tradeQty) {
-        return {buyOrder->getOrderId(), sellOrder->getOrderId(), tradePrice, tradeQty,
-                buyOrder->getPrice(), buyOrder->getOrderType(), buyOrder->getTimeInForce(),
-                sellOrder->getPrice(), sellOrder->getOrderType(), sellOrder->getTimeInForce()};
+    static Trade* createTrade(const OrderPointer buyOrder, const OrderPointer sellOrder, Price tradePrice, Quantity tradeQty) {
+        return new Trade{buyOrder->getOrderId(), sellOrder->getOrderId(), tradePrice, tradeQty,
+                         buyOrder->getPrice(), buyOrder->getOrderType(), buyOrder->getTimeInForce(),
+                         sellOrder->getPrice(), sellOrder->getOrderType(), sellOrder->getTimeInForce()};
     }
 };
+
+using TradePointer = Trade*;
+
 } // namespace ob

@@ -9,14 +9,11 @@ namespace ob {
 
 void OrderBook::addOrder(OrderPointer order) {
     Price orderPrice = order->getPrice();
+    orders_.emplace(order->getOrderId(), order);
     if (order->getOrderSide() == OrderSide::Buy) {
         buyOrders_[orderPrice].push_back(order);
-        auto it = std::prev(buyOrders_[orderPrice].end());
-        orders_.emplace(order->getOrderId(), OrderEntry{order, it});
     } else {
         sellOrders_[orderPrice].push_back(order);
-        auto it = std::prev(sellOrders_[orderPrice].end());
-        orders_.emplace(order->getOrderId(), OrderEntry{order, it});
     }
 }
 
@@ -27,15 +24,19 @@ void OrderBook::removeOrder(OrderId orderId) {
         return;
     }
 
-    auto [order, iter] = it->second;
+    auto order = it->second; // if make as a reference, need to swap below orders_.erase(it) and ObjectPool::release to avoid seg fault due to reference erased UB
     Price orderPrice = order->getPrice();
     if (order->getOrderSide() == OrderSide::Buy) {
-        buyOrders_[orderPrice].erase(iter);
+        auto& ordersAtPriceLevel = buyOrders_[orderPrice];
+        auto it = std::find(ordersAtPriceLevel.begin(), ordersAtPriceLevel.end(), order);
+        ordersAtPriceLevel.erase(it);
         if (buyOrders_[orderPrice].empty()) {
             buyOrders_.erase(orderPrice);
         }
     } else {
-        sellOrders_[orderPrice].erase(iter);
+        auto& ordersAtPriceLevel = sellOrders_[orderPrice];
+        auto it = std::find(ordersAtPriceLevel.begin(), ordersAtPriceLevel.end(), order);
+        ordersAtPriceLevel.erase(it);
         if (sellOrders_[orderPrice].empty()) {
             sellOrders_.erase(orderPrice);
         }
@@ -50,7 +51,7 @@ void OrderBook::cancelOrder(OrderId orderId) {
         // might want to log
         return;
     }
-    auto order = it->second.order_;
+    auto order = it->second;
     order->cancel();
     removeOrder(orderId);    
 }

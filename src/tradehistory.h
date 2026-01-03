@@ -7,15 +7,28 @@ namespace ob {
 
 class TradeHistory {
 private:
-    std::vector<Trade> trades_;
+    std::vector<TradePointer> trades_;
 
 public:
-    void recordTrade(const Trade& trade) {
+
+    ~TradeHistory() {
+        clear();
+    }
+
+    void recordTrade(TradePointer trade) {
         trades_.push_back(trade);
     }
 
-    const std::vector<Trade>& getTrades() const {
+    const std::vector<TradePointer>& getTrades() const {
         return trades_;
+    }
+
+private:
+    // for google benchmark
+    void clear() {
+        for (auto trade : trades_) {
+            delete trade;
+        }
     }
 };
 } // namespace ob

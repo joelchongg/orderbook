@@ -32,7 +32,7 @@ void MatchingEngine::onCancelOrder(OrderId orderId) {
     orderBook_.cancelOrder(orderId);
 }
 
-void MatchingEngine::matchOrders(OrderPointer& incomingOrder) {
+void MatchingEngine::matchOrders(OrderPointer incomingOrder) {
     switch (incomingOrder->getTimeInForce()) {
         case TimeInForce::GoodTillCancel:
             [[fallthrough]];
@@ -86,7 +86,7 @@ bool MatchingEngine::canMatch(OrderPointer order) {
     }
 }
 
-Trade MatchingEngine::executeTrade(const OrderPointer& incomingOrder, const OrderPointer& restingOrder) {
+TradePointer MatchingEngine::executeTrade(const OrderPointer incomingOrder, const OrderPointer restingOrder) {
     OrderId incomingOrderId = incomingOrder->getOrderId();
     OrderId restingOrderId = restingOrder->getOrderId();
 
@@ -120,15 +120,14 @@ Trade MatchingEngine::executeTrade(const OrderPointer& incomingOrder, const Orde
 }
 
 template <typename BookType>
-void MatchingEngine::matchWithBook(OrderPointer& incomingOrder, BookType& oppositeBook) {
+void MatchingEngine::matchWithBook(OrderPointer incomingOrder, BookType& oppositeBook) {
     while (incomingOrder->getRemainingQuantity() > 0) {
         if (!canMatch(incomingOrder)) {
             break;
         }
-        
         auto& [_, ordersAtPrice] = *oppositeBook.begin();
-        auto& restingOrder = ordersAtPrice.front();
-        Trade trade = executeTrade(incomingOrder, restingOrder);
+        auto restingOrder = ordersAtPrice.front();
+        TradePointer trade = executeTrade(incomingOrder, restingOrder);
         tradeHistory_.recordTrade(trade);
 
         if (restingOrder->getOrderStatus() == OrderStatus::Filled) {
@@ -138,7 +137,7 @@ void MatchingEngine::matchWithBook(OrderPointer& incomingOrder, BookType& opposi
 }
 
 template <typename BookType>
-void MatchingEngine::tryToMatchWithBook(OrderPointer& incomingOrder, BookType& oppositeBook) {
+void MatchingEngine::tryToMatchWithBook(OrderPointer incomingOrder, BookType& oppositeBook) {
     OrderPointers entries;
     Quantity qtyNeeded = incomingOrder->getInitialQuantity();
     auto levelIt = oppositeBook.begin();
@@ -170,7 +169,7 @@ void MatchingEngine::tryToMatchWithBook(OrderPointer& incomingOrder, BookType& o
 
     if (qtyNeeded == 0) {
         for (const auto& entry : entries) {
-            Trade trade = executeTrade(incomingOrder, entry);
+            TradePointer trade = executeTrade(incomingOrder, entry);
             tradeHistory_.recordTrade(trade);
 
             if (entry->getOrderStatus() == OrderStatus::Filled) {

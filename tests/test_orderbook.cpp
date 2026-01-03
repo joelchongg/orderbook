@@ -43,8 +43,8 @@ TEST_CASE("Partial match updates quantities and records trade") {
 
     const auto& trades = history.getTrades();
     REQUIRE(trades.size() == 1);
-    REQUIRE(trades[0].tradePrice_ == 100);
-    REQUIRE(trades[0].tradeQuantity_ == 20);
+    REQUIRE(trades[0]->tradePrice_ == 100);
+    REQUIRE(trades[0]->tradeQuantity_ == 20);
     REQUIRE(restingBuy->getRemainingQuantity() == 30);
     REQUIRE(incomingSell->getRemainingQuantity() == 0);
     REQUIRE(incomingSell->getOrderStatus() == OrderStatus::Filled);
@@ -131,10 +131,10 @@ TEST_CASE("Buy consumes across two sell levels") {
     engine.onNewOrder(incomingBuy);
     const auto& trades = history.getTrades();
     REQUIRE(trades.size() == 2);
-    REQUIRE(trades[0].tradePrice_ == 99);
-    REQUIRE(trades[0].tradeQuantity_ == 15);
-    REQUIRE(trades[1].tradePrice_ == 100);
-    REQUIRE(trades[1].tradeQuantity_ == 15);
+    REQUIRE(trades[0]->tradePrice_ == 99);
+    REQUIRE(trades[0]->tradeQuantity_ == 15);
+    REQUIRE(trades[1]->tradePrice_ == 100);
+    REQUIRE(trades[1]->tradeQuantity_ == 15);
     auto& sells = book.getSellOrders();
     REQUIRE(sells.size() == 1);
     REQUIRE(sells.begin()->first == 100);
@@ -151,8 +151,8 @@ TEST_CASE("Sell matches only at best bid price") {
     engine.onNewOrder(incomingSell);
     const auto& trades = history.getTrades();
     REQUIRE(trades.size() == 1);
-    REQUIRE(trades[0].tradePrice_ == 100);
-    REQUIRE(trades[0].tradeQuantity_ == 25);
+    REQUIRE(trades[0]->tradePrice_ == 100);
+    REQUIRE(trades[0]->tradeQuantity_ == 25);
     auto& buys = book.getBuyOrders();
     REQUIRE(buys.size() == 1);
     REQUIRE(buys.begin()->first == 99);
@@ -230,8 +230,8 @@ TEST_CASE("Trade price is always resting order price") {
     const auto& trades = history.getTrades();
     REQUIRE(trades.size() == 1);
     // Trade should execute at 99 (resting), not 105 (incoming)
-    REQUIRE(trades[0].tradePrice_ == 99);
-    REQUIRE(trades[0].tradeQuantity_ == 10);
+    REQUIRE(trades[0]->tradePrice_ == 99);
+    REQUIRE(trades[0]->tradeQuantity_ == 10);
 }
 
 TEST_CASE("Fully filled incoming order is removed from book") {
@@ -282,12 +282,12 @@ TEST_CASE("Price priority across 3 sell levels") {
 
     const auto& trades = history.getTrades();
     REQUIRE(trades.size() == 3);
-    REQUIRE(trades[0].tradePrice_ == 98);
-    REQUIRE(trades[0].tradeQuantity_ == 10);
-    REQUIRE(trades[1].tradePrice_ == 99);
-    REQUIRE(trades[1].tradeQuantity_ == 15);
-    REQUIRE(trades[2].tradePrice_ == 100);
-    REQUIRE(trades[2].tradeQuantity_ == 10);
+    REQUIRE(trades[0]->tradePrice_ == 98);
+    REQUIRE(trades[0]->tradeQuantity_ == 10);
+    REQUIRE(trades[1]->tradePrice_ == 99);
+    REQUIRE(trades[1]->tradeQuantity_ == 15);
+    REQUIRE(trades[2]->tradePrice_ == 100);
+    REQUIRE(trades[2]->tradeQuantity_ == 10);
 
     auto& sells = book.getSellOrders();
     REQUIRE(sells.size() == 1);
