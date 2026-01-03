@@ -9,6 +9,7 @@ add_library(orderbook_lib
     src/matching_engine.cpp
     src/order_gateway.cpp
     src/orderbook.cpp
+    src/utils/object_pool.cpp
 )
 
 # Public headers location
@@ -29,6 +30,7 @@ FetchContent_MakeAvailable(Catch2)
 enable_testing()
 add_executable(orderbook_tests
     tests/test_orderbook.cpp
+    tests/test_object_pool.cpp
 )
 
 target_link_libraries(orderbook_tests PRIVATE
@@ -42,4 +44,31 @@ catch_discover_tests(orderbook_tests)
 
 
 # Run tests via ctest 
-# cmake --build build && ctest --test-dir build --output-on-failure  
+# cmake --build build && ctest --test-dir build --output-on-failure
+
+# ============================================================================
+# BENCHMARKS with Google Benchmark
+# ============================================================================
+
+FetchContent_Declare(
+    google_benchmark
+    GIT_REPOSITORY https://github.com/google/benchmark.git
+    GIT_TAG main
+)
+
+set(BENCHMARK_ENABLE_TESTING OFF)
+set(BENCHMARK_ENABLE_GTEST_TESTS OFF)
+
+FetchContent_MakeAvailable(google_benchmark)
+
+# Benchmark executable
+add_executable(orderbook_benchmark
+    benchmarks/orderbook_benchmark.cpp
+)
+
+target_link_libraries(orderbook_benchmark PRIVATE
+    orderbook_lib
+    benchmark::benchmark
+)
+
+# Can run with: ./build/orderbook_benchmark

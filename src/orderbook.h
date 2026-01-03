@@ -13,7 +13,6 @@
 namespace ob {
 
 using OrderPointers = std::list<OrderPointer>;
-using Trades = std::vector<Trade>;
 
 class OrderBook {
 private:

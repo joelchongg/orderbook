@@ -4,7 +4,8 @@
 
 namespace ob {
 
-ObjectPool::ObjectPool(uint32_t initialSize) {
+// Might want to experiment with initialSize
+ObjectPool::ObjectPool(uint32_t initialSize = 10) {
     expiredOrders_.reserve(initialSize);
     while (initialSize > 0) {
         expiredOrders_.push_back(Order::createDummyOrder());
